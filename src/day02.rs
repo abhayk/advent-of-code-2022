@@ -1,16 +1,13 @@
 pub fn part1(input: String) -> u32 {
     input
-        .split('\n')
+        .lines()
         .map(|line| line.split_once(' ').unwrap())
         .map(score)
         .sum()
 }
 
 pub fn part2(input: String) -> u32 {
-    input.split('\n')
-        .map(parse)
-        .map(score)
-        .sum()
+    input.lines().map(parse).map(score).sum()
 }
 
 fn parse(line: &str) -> (&str, &str) {
@@ -24,7 +21,7 @@ fn parse(line: &str) -> (&str, &str) {
         ("C", "X") => ("C", "Y"),
         ("C", "Y") => ("C", "Z"),
         ("C", "Z") => ("C", "X"),
-        (_,_) => ("invalid", "invalid")
+        (_, _) => ("invalid", "invalid"),
     }
 }
 

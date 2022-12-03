@@ -22,13 +22,12 @@ fn part2_example() {
         day02::part2(std::fs::read_to_string("tests/day02/example.txt").unwrap()),
         12
     );
-
 }
 
 #[test]
 fn part2() {
     assert_eq!(
         day02::part2(std::fs::read_to_string("tests/day02/input.txt").unwrap()),
-        13565
+        12424
     );
 }

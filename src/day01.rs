@@ -13,7 +13,7 @@ fn calories_per_elf(input: String) -> Vec<u32> {
     input
         .split("\n\n")
         .map(|food| {
-            food.split('\n')
+            food.lines()
                 .map(|calories| calories.parse::<u32>().unwrap())
                 .sum()
         })
