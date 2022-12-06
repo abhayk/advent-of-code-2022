@@ -10,15 +10,9 @@ pub fn part2(input: String) -> usize {
 
 fn find_start_marker(input: &str, window_size: usize) -> usize {
     let chars = input.chars().collect::<Vec<char>>();
-    chars
-        .windows(window_size)
-        .enumerate()
-        .find(|(_, window)| is_unique(window))
-        .unwrap()
-        .0
-        + window_size
+    chars.windows(window_size).position(all_unique).unwrap() + window_size
 }
 
-fn is_unique(input: &[char]) -> bool {
+fn all_unique(input: &[char]) -> bool {
     HashSet::<&char>::from_iter(input.iter()).len() == input.len()
 }
