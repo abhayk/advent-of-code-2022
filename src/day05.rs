@@ -1,77 +1,77 @@
+use once_cell::sync::OnceCell;
 use regex::Regex;
+
+struct Instruction {
+    count: usize,
+    from: usize,
+    to: usize,
+}
 
 pub fn part1(input: String) -> String {
     let mut split = input.split("\n\n");
     let mut stacks = parse_stacks(split.next().unwrap());
-
-    let regex = Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap();
-    apply_instructions(
-        split.next().unwrap(),
-        &regex,
-        &mut stacks,
-        apply_instruction,
-    );
-
+    split
+        .next()
+        .unwrap()
+        .lines()
+        .map(parse_instruction)
+        .for_each(|instruction| apply_instruction(instruction, &mut stacks));
     format_output(&stacks)
 }
 
 pub fn part2(input: String) -> String {
     let mut split = input.split("\n\n");
     let mut stacks = parse_stacks(split.next().unwrap());
-
-    let regex = Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap();
-    apply_instructions(
-        split.next().unwrap(),
-        &regex,
-        &mut stacks,
-        apply_instruction_v2,
-    );
+    split
+        .next()
+        .unwrap()
+        .lines()
+        .map(parse_instruction)
+        .for_each(|instruction| apply_instruction_v2(instruction, &mut stacks));
     format_output(&stacks)
 }
 
-fn apply_instructions<F>(input: &str, regex: &Regex, stacks: &mut [Vec<char>], mut func: F)
-where
-    F: FnMut((usize, usize, usize), &mut [Vec<char>]),
-{
-    input
-        .lines()
-        .map(|line| parse_instruction(line, regex))
-        .for_each(|(count, from, to)| {
-            func((count, from, to), stacks);
-        });
+fn regex() -> &'static Regex {
+    static INSTANCE: OnceCell<Regex> = OnceCell::new();
+    INSTANCE.get_or_init(|| Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap())
 }
 
-fn apply_instruction((count, from, to): (usize, usize, usize), stacks: &mut [Vec<char>]) {
-    (0..count).for_each(|_| {
-        let val = stacks[from].pop().unwrap();
-        stacks[to].push(val);
+fn apply_instruction(instruction: Instruction, stacks: &mut [Vec<char>]) {
+    (0..instruction.count).for_each(|_| {
+        let val = stacks[instruction.from].pop().unwrap();
+        stacks[instruction.to].push(val);
     })
 }
 
-fn apply_instruction_v2((count, from, to): (usize, usize, usize), stacks: &mut [Vec<char>]) {
-    let mut tmp = Vec::new();
-    (0..count).for_each(|_| {
-        tmp.push(stacks[from].pop().unwrap());
-    });
-    tmp.iter().rev().for_each(|val| stacks[to].push(*val));
+fn apply_instruction_v2(instruction: Instruction, stacks: &mut [Vec<char>]) {
+    (0..instruction.count)
+        .map(|_| stacks[instruction.from].pop().unwrap())
+        .collect::<Vec<char>>()
+        .iter()
+        .rev()
+        .for_each(|val| stacks[instruction.to].push(*val));
 }
 
 fn format_output(stacks: &[Vec<char>]) -> String {
     stacks
-    .iter()
-    .map(|stack| stack.last().unwrap())
-    .collect::<String>()
+        .iter()
+        .map(|stack| stack.last().unwrap())
+        .collect::<String>()
 }
 
-fn parse_instruction(line: &str, regex: &Regex) -> (usize, usize, usize) {
-    let vec = regex
+fn parse_instruction(line: &str) -> Instruction {
+    let vec = regex()
         .captures(line)
         .unwrap()
         .iter()
         .skip(1)
         .map(|item| item.unwrap().as_str().parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
-    (vec[0], vec[1] - 1, vec[2] - 1)
+    Instruction {
+        count: vec[0],
+        from: vec[1] - 1,
+        to: vec[2] - 1,
+    }
 }
 
 fn parse_stacks(input: &str) -> Vec<Vec<char>> {
