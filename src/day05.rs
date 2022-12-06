@@ -7,6 +7,11 @@ struct Instruction {
     to: usize,
 }
 
+fn regex() -> &'static Regex {
+    static INSTANCE: OnceCell<Regex> = OnceCell::new();
+    INSTANCE.get_or_init(|| Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap())
+}
+
 pub fn part1(input: String) -> String {
     let mut split = input.split("\n\n");
     let mut stacks = parse_stacks(split.next().unwrap());
@@ -29,11 +34,6 @@ pub fn part2(input: String) -> String {
         .map(parse_instruction)
         .for_each(|instruction| apply_instruction_v2(instruction, &mut stacks));
     format_output(&stacks)
-}
-
-fn regex() -> &'static Regex {
-    static INSTANCE: OnceCell<Regex> = OnceCell::new();
-    INSTANCE.get_or_init(|| Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap())
 }
 
 fn apply_instruction(instruction: Instruction, stacks: &mut [Vec<char>]) {

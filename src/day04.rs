@@ -1,4 +1,10 @@
+use once_cell::sync::OnceCell;
 use regex::Regex;
+
+fn regex() -> &'static Regex {
+    static INSTANCE: OnceCell<Regex> = OnceCell::new();
+    INSTANCE.get_or_init(|| Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)").unwrap())
+}
 
 pub fn part1(input: String) -> u32 {
     let regex = regex();
@@ -16,10 +22,6 @@ pub fn part2(input: String) -> u32 {
         .map(|line| parse(line, &regex))
         .filter(|ranges| partial_overlap(ranges))
         .count() as u32
-}
-
-fn regex() -> Regex {
-    Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)").unwrap()
 }
 
 fn full_overlap(v: &[u32]) -> bool {
