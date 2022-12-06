@@ -10,7 +10,7 @@ pub fn part1(input: String) -> u32 {
     let regex = regex();
     input
         .lines()
-        .map(|line| parse(line, &regex))
+        .map(|line| parse(line, regex))
         .filter(|ranges| full_overlap(ranges))
         .count() as u32
 }
@@ -19,7 +19,7 @@ pub fn part2(input: String) -> u32 {
     let regex = regex();
     input
         .lines()
-        .map(|line| parse(line, &regex))
+        .map(|line| parse(line, regex))
         .filter(|ranges| partial_overlap(ranges))
         .count() as u32
 }
